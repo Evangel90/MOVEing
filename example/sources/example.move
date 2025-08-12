@@ -44,3 +44,29 @@ public fun swords_created(self: &Forge): u64 {
 // Part 5: Public/entry functions (introduced later in the tutorial)
 
 // Part 6: Tests
+
+
+//Custom
+
+public struct MintedSword has copy, drop{
+    swordId: ID,
+    magic: u8,
+    strength: u8
+}
+
+
+public fun mint_sword(_: &Forge, magic: u8, strength: u8, ctx: &mut TxContext){
+    let sword = Sword{
+        id: object::new(ctx),
+        magic: magic,
+        strength:strength,
+    };
+
+    emit::event(MintedSword{
+        sword: sword.id,
+        magic: sword.magic,
+        strength: sword.strength
+    });
+
+    transfer::publicTransfer(sword, ctx.sender())
+}
