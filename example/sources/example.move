@@ -44,12 +44,15 @@ public fun swords_created(self: &Forge): u64 {
 }
 
 // Part 5: Public/entry functions (introduced later in the tutorial)
-
-// Part 6: Tests
-
+public fun sword_create(magic: u64, strength: u64, ctx: &mut TxContext): Sword {
+    Sword {
+        id: object::new(ctx),
+        magic: magic,
+        strength: strength,
+    }
+}
 
 //Custom
-
 public struct MintedSword has copy, drop{
     swordId: ID,
     magic: u64,
@@ -60,11 +63,7 @@ public struct MintedSword has copy, drop{
 public fun mint_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut TxContext){
     forge.swords_created = forge.swords_created + 1;
 
-    let sword = Sword{
-        id: object::new(ctx),
-        magic: magic,
-        strength:strength,
-    };
+    let sword = sword_create(magic, strength, ctx);
 
     event::emit(MintedSword{
         swordId: object::id(&sword),
@@ -73,4 +72,65 @@ public fun mint_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut Tx
     });
 
     transfer::public_transfer(sword, ctx.sender())
+}
+
+
+// Part 6: Tests
+
+#[test]
+fun test_sword_create() {
+    // Create a dummy TxContext for testing
+    let mut ctx = tx_context::dummy();
+
+    // Create a sword
+    let sword = Sword {
+        id: object::new(&mut ctx),
+        magic: 42,
+        strength: 7,
+    };
+
+    // Check if accessor functions return correct values
+    assert!(sword.magic() == 42 && sword.strength() == 7, 1);
+
+    let dummy_address = @0xCAFE;
+    transfer::public_transfer(sword, dummy_address);
+
+}
+
+#[test]
+fun test_sword_transactions() {
+    use sui::test_scenario;
+
+    // Create test addresses representing users
+    let initial_owner = @0xCAFE;
+    let final_owner = @0xFACE;
+
+    // First transaction executed by initial owner to create the sword
+    let mut scenario = test_scenario::begin(initial_owner);
+    {
+        // Create the sword and transfer it to the initial owner
+        let sword = sword_create(42, 7, scenario.ctx());
+        transfer::public_transfer(sword, initial_owner);
+    };
+
+    // Second transaction executed by the initial sword owner
+    scenario.next_tx(initial_owner);
+    {
+        // Extract the sword owned by the initial owner
+        let sword = scenario.take_from_sender<Sword>();
+        // Transfer the sword to the final owner
+        transfer::public_transfer(sword, final_owner);
+    };
+
+    // Third transaction executed by the final sword owner
+    scenario.next_tx(final_owner);
+    {
+        // Extract the sword owned by the final owner
+        let sword = scenario.take_from_sender<Sword>();
+        // Verify that the sword has expected properties
+        assert!(sword.magic() == 42 && sword.strength() == 7, 1);
+        // Return the sword to the object pool (it cannot be simply "dropped")
+        scenario.return_to_sender(sword)
+    };
+    scenario.end();
 }
