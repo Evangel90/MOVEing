@@ -57,7 +57,9 @@ public struct MintedSword has copy, drop{
 }
 
 #[allow(lint(self_transfer))]
-public fun mint_sword(_: &Forge, magic: u64, strength: u64, ctx: &mut TxContext){
+public fun mint_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut TxContext){
+    forge.swords_created = forge.swords_created + 1;
+
     let sword = Sword{
         id: object::new(ctx),
         magic: magic,
