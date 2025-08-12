@@ -1,5 +1,7 @@
 module example::example;
 
+use sui::event;
+
 // Part 1: These imports are provided by default
 // use sui::object::{Self, UID};
 // use sui::transfer;
@@ -50,23 +52,23 @@ public fun swords_created(self: &Forge): u64 {
 
 public struct MintedSword has copy, drop{
     swordId: ID,
-    magic: u8,
-    strength: u8
+    magic: u64,
+    strength: u64
 }
 
-
-public fun mint_sword(_: &Forge, magic: u8, strength: u8, ctx: &mut TxContext){
+#[allow(lint(self_transfer))]
+public fun mint_sword(_: &Forge, magic: u64, strength: u64, ctx: &mut TxContext){
     let sword = Sword{
         id: object::new(ctx),
         magic: magic,
         strength:strength,
     };
 
-    emit::event(MintedSword{
-        sword: sword.id,
+    event::emit(MintedSword{
+        swordId: object::id(&sword),
         magic: sword.magic,
         strength: sword.strength
     });
 
-    transfer::publicTransfer(sword, ctx.sender())
+    transfer::public_transfer(sword, ctx.sender())
 }
