@@ -1,6 +1,7 @@
 module example::example;
 
 use sui::event;
+use std::debug;
 
 // Part 1: These imports are provided by default
 // use sui::object::{Self, UID};
@@ -73,7 +74,10 @@ public fun mint_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut Tx
 }
 
 public fun new_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut TxContext): Sword {
+    debug::print(forge);
     forge.swords_created = forge.swords_created + 1;
+    debug::print(forge);
+    debug::print_stack_trace();
     sword_create(magic, strength, ctx)
 }
 
