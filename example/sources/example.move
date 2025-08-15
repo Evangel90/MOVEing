@@ -61,9 +61,7 @@ public struct MintedSword has copy, drop{
 
 #[allow(lint(self_transfer))]
 public fun mint_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut TxContext){
-    forge.swords_created = forge.swords_created + 1;
-
-    let sword = sword_create(magic, strength, ctx);
+    let sword = new_sword(forge, magic, strength, ctx);
 
     event::emit(MintedSword{
         swordId: object::id(&sword),
@@ -72,6 +70,11 @@ public fun mint_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut Tx
     });
 
     transfer::public_transfer(sword, ctx.sender())
+}
+
+public fun new_sword(forge: &mut Forge, magic: u64, strength: u64, ctx: &mut TxContext): Sword {
+    forge.swords_created = forge.swords_created + 1;
+    sword_create(magic, strength, ctx)
 }
 
 
@@ -132,5 +135,36 @@ fun test_sword_transactions() {
         // Return the sword to the object pool (it cannot be simply "dropped")
         scenario.return_to_sender(sword)
     };
+    scenario.end();
+}
+
+#[test]
+fun test_module_intit(){
+    use sui::test_scenario;
+
+    let admin = @0xAD;
+    let initial_owner = @0xCAFE;
+
+    let mut scenario = test_scenario::begin(admin);
+
+    {
+        init(scenario.ctx());
+    };
+
+    scenario.next_tx(admin);
+    {
+        let forge = scenario.take_from_sender<Forge>();
+        assert!(forge.swords_created() == 0, 1);
+        scenario.return_to_sender(forge);
+    };
+
+    scenario.next_tx(admin);
+    {
+        let mut forge = scenario.take_from_sender<Forge>();
+        let sword  = forge.new_sword(42, 7, scenario.ctx());
+        transfer::public_transfer(sword, initial_owner);
+        scenario.return_to_sender(forge);
+    };
+
     scenario.end();
 }
