@@ -9,14 +9,14 @@ public struct Mail has key {
 }
 
 entry fun seal_approve(mail: &Mail, ctx: &mut TxContext){
-    assert!(checkParties(mail, ctx), 1)
+    assert!(check_parties(mail, ctx), 1)
 }
 
 public fun check_parties(mail: &Mail, ctx: &mut TxContext): bool{
-    if(ctx.sender == mail.sender || ctx.sender == mail.receiver){
-        true;
+    if(ctx.sender() == mail.sender || ctx.sender() == mail.receiver){
+        return true
     }else{
-        false;
+        return false
     }
 }
 
