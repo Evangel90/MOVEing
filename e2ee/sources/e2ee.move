@@ -31,6 +31,10 @@ public fun create_mail(receiver: address, blobId: vector<u8>, ctx: &mut TxContex
     // transfer::share_object<Mail>(mail);
 }
 
+public fun share_mail(receiver: address, blobId: vector<u8>, ctx: &mut TxContext) {
+    let mail = create_mail(receiver, blobId, ctx);
+    transfer::share_object<Mail>(mail);
+}
 
 #[test]
 fun test_e2ee() {
@@ -46,7 +50,7 @@ fun test_e2ee() {
     let mail = create_mail(receiver, blobId, &mut ctx);
     assert!(check_parties(&mail, &mut ctx), 1);
     transfer::share_object<Mail>(mail);
-    
+
 
     // {
     // };
