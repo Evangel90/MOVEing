@@ -14,9 +14,9 @@ entry fun seal_approve(mail: &Mail, ctx: &mut TxContext){
 
 public fun check_parties(mail: &Mail, ctx: &mut TxContext): bool{
     if(ctx.sender() == mail.sender || ctx.sender() == mail.receiver){
-        return true
+        true
     }else{
-        return false
+        false
     }
 }
 
