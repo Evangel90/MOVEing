@@ -2,6 +2,7 @@
 module coin::custom_coin;
 
 use sui::coin::{Self, TreasuryCap, Coin};
+use sui::balance::{Balance};
 
 public struct CUSTOM_COIN has drop {}
 
@@ -35,7 +36,12 @@ public fun burn(treasury_cap: &mut TreasuryCap<CUSTOM_COIN>, c: Coin<CUSTOM_COIN
     coin::burn(treasury_cap, c)
 }
 
-
+public fun mint_balance(treasury_cap: &mut TreasuryCap<CUSTOM_COIN>, value: u64): Balance<CUSTOM_COIN>{
+    coin::mint_balance(
+        treasury_cap,
+        value
+    )
+}
 
 
 // For Move coding conventions, see
