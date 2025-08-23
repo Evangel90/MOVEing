@@ -1,7 +1,7 @@
 /// Module: coin
 module coin::custom_coin;
 
-use sui::coin::{Self, TreasuryCap};
+use sui::coin::{Self, TreasuryCap, Coin};
 
 public struct CUSTOM_COIN has drop {}
 
@@ -31,6 +31,9 @@ public fun mint(treasury_cap: &mut TreasuryCap<CUSTOM_COIN>, value: u64, recipie
     transfer::public_transfer(custom_coin, recipient);
 }
 
+public fun burn(treasury_cap: &mut TreasuryCap<CUSTOM_COIN>, c: Coin<CUSTOM_COIN>): u64{
+    coin::burn(treasury_cap, c)
+}
 
 
 
