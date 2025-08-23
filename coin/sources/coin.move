@@ -3,9 +3,9 @@ module coin::custom_coin;
 
 use sui::coin::{Self, TreasuryCap};
 
-public struct CustomCoin has drop {}
+public struct CUSTOM_COIN has drop {}
 
-fun init(otw: CustomCoin, ctx: &mut TxContext){
+fun init(otw: CUSTOM_COIN, ctx: &mut TxContext){
     let (treasury_cap, coin_metadata) = coin::create_currency(
         otw,
         9,
@@ -20,7 +20,7 @@ fun init(otw: CustomCoin, ctx: &mut TxContext){
     transfer::public_transfer(treasury_cap, ctx.sender());
 }
 
-public fun mint(treasury_cap: &mut TreasuryCap<CustomCoin>, value: u64, recipient: address, ctx: &mut TxContext){
+public fun mint(treasury_cap: &mut TreasuryCap<CUSTOM_COIN>, value: u64, recipient: address, ctx: &mut TxContext){
     let custom_coin = coin::mint(
         treasury_cap,
         value,
