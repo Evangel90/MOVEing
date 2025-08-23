@@ -20,6 +20,16 @@ fun init(otw: CustomCoin, ctx: &mut TxContext){
     transfer::public_transfer(treasury_cap, ctx.sender());
 }
 
+public fun mint(treasury_cap: &mut TreasuryCap<CustomCoin>, value: u64, recipient: address, ctx: &mut TxContext){
+    let custom_coin = coin::mint(
+        treasury_cap,
+        value,
+        ctx
+    );
+    transfer::public_transfer(custom_coin, recipient);
+}
+
+
 
 
 
